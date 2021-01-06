@@ -1,0 +1,24 @@
+name: Deploy to GitHub Pages
+
+#Run worlflow on every push to the master branch
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy-to-github-pages:
+    #use ubuntu 
+    runs-on: ubuntu-latest
+    steps:
+      #uses Githubs checkout action to checkout code from master branch
+      - uses: actions/checkout@v2
+     
+      #sets up .NET core SDK 5.0
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 5.0
+          
+      #publishes Blazor project to the release folder
+      - name: Publish .NET Core Project
+        run: dotnet publish Blahjong.csproj -c Release -o release --nologo
