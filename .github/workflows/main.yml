@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 # Run workflow on every push to the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   deploy-to-github-pages:
@@ -35,9 +35,9 @@ jobs:
     - name: Add .nojekyll file
       run: touch release/wwwroot/.nojekyll
       
-    #- name: Commit wwwroot to GitHub Pages
-    #  uses: JamesIves/github-pages-deploy-action@3.7.1
-    #  with:
-    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #    BRANCH: gh-pages
-    #    FOLDER: release/wwwroot
+    - name: Commit wwwroot to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: release/wwwroot
