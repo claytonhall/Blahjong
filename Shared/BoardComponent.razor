@@ -1,0 +1,68 @@
+﻿@if (UnmatchedTiles.Any())
+{
+    @for (var z = 0; z <= UnmatchedTiles.Max(t => t.Z); z++)
+    {
+        @foreach (var tile in UnmatchedTiles.Where(tile => tile.Z.Equals(z)).ToList())
+        {
+            <TileComponent Tile=@tile OnSelect=@(()=>Select(tile))></TileComponent>
+        }
+    }
+}
+
+
+@code {
+    public List<Tile> Tiles { get; set; }
+
+    public List<Tile> UnmatchedTiles => Tiles?.Where(t => !t.IsMatched)?.ToList() ?? new List<Tile>();
+
+    protected override Task OnInitializedAsync()
+    {
+        //return base.OnInitializedAsync();
+
+        return Task.Run(() =>
+        {
+            Tiles = GameEngine.NewGame();
+        });
+    }
+
+
+    public void Select(Tile tile)
+    {
+        if (tile.IsFree)
+        {
+            var currentlySelected = Tiles.SingleOrDefault(t => t.IsSelected && !t.IsMatched);
+            if (currentlySelected != tile)
+            {
+                if (currentlySelected != null)
+                {
+                    if (currentlySelected.Matches(tile))
+                    {
+                        currentlySelected.IsMatched = true;
+                        tile.IsMatched = true;
+                    }
+                }
+                //unselect everything else!
+                Tiles.Where(t => t.IsSelected).ToList().ForEach(t => t.IsSelected = false);
+                tile.IsSelected = true;
+            }
+        }
+
+        Tiles = EvaluateFreeTiles(Tiles, (f) => f.Where(t => !t.IsMatched).ToList());
+
+        Console.WriteLine($"{tile.TileType} - {tile.Value} - i got clicked");
+    }
+
+    public List<Tile> EvaluateFreeTiles(List<Tile> tiles, Func<List<Tile>, List<Tile>> filter = null)
+    {
+        if (filter == null)
+        {
+            filter = (t) => t;
+        }
+        var filteredTiles = filter(tiles);
+        foreach (var tile in filteredTiles)
+        {
+            tile.IsFree = tile.IsFree(filteredTiles);
+        }
+        return tiles;
+    }
+}

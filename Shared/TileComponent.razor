@@ -1,0 +1,24 @@
+﻿<div class="@(Tile.cssClass)" style="@($"left:{left}px;top:{top}px;")" @onclick="@(() => Select(Tile))">
+    <div class="tile-trimmed">
+        <div class="inner-tile">
+            @*@((MarkupString) $"&#{126976};")*@
+            @((MarkupString) $"&#{Tile.Value};")
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Tile Tile { get; set; }
+
+    [Parameter]
+    public EventCallback<Tile> OnSelect { get; set; }
+
+    public double left => Tile.X * 62 - (8 * Tile.Z);
+    public double top => Tile.Y * 82 - (8 * Tile.Z);
+
+    public async Task Select(Tile tile)
+    {
+        OnSelect.InvokeAsync(tile);
+    }
+}
